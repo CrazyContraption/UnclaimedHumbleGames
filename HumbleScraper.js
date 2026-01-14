@@ -36,7 +36,7 @@ clickAllViewMoreButtons().then(() => {
   function extractContentChoiceData(doc, url) {
     const monthEl = doc.querySelector('h3.content-choices-title');
     const month = monthEl ? monthEl.textContent.trim() : 'Unknown';
-    const baseUrl = "https://www.humblebundle.com/membership/june-2025" // Adjust this base URL as needed
+    const baseUrl = "https://www.humblebundle.com/membership/february-2026" // Adjust this base URL as needed
 
     const tilesContainer = doc.querySelector('div.content-choice-tiles.js-content-choice-tiles');
     const tiles = tilesContainer ? Array.from(tilesContainer.querySelectorAll('div.content-choice')) : [];
@@ -122,9 +122,10 @@ clickAllViewMoreButtons().then(() => {
     const filteredData = data.filter(group => group.items && group.items.length > 0);
     const monthLinks = filteredData.map(group => `<a href="#${group.month.replace(/\s+/g, '_')}">${group.month}</a>`).join('<br>');
 
-    const html = `<!DOCTYPE html>
+    let html = `<!DOCTYPE html>
     <html lang="en">
     <head>
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
       <meta charset="UTF-8">
       <title>Crazy's Unclaimed Humble Games</title>
       <style>
@@ -222,6 +223,9 @@ clickAllViewMoreButtons().then(() => {
       </script>
     </body>
     </html>`;
+
+    // Replace <i class="hb hb- with <i class="fa fa- before opening the document
+    html = html.replace(/<i class="hb hb-/g, '<i class="fa fa-');
     win.document.write(html);
     win.document.close();
   }
