@@ -224,8 +224,8 @@ clickAllViewMoreButtons().then(() => {
     </body>
     </html>`;
 
-    // Replace <i class="hb hb- with <i class="fa fa- before opening the document
-    html = html.replace(/<i class="hb hb-/g, '<i class="fa fa-');
+    // Replace <i class="hb hb- with <i class="fa-brands fa- before opening the document
+    html = html.replace(/<i class="hb hb-/g, '<i class="fa-brands fa-');
     win.document.write(html);
     win.document.close();
   }
