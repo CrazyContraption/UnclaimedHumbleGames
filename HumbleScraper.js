@@ -36,7 +36,14 @@ clickAllViewMoreButtons().then(() => {
   function extractContentChoiceData(doc, url) {
     const monthEl = doc.querySelector('h3.content-choices-title');
     const month = monthEl ? monthEl.textContent.trim() : 'Unknown';
-    const baseUrl = "https://www.humblebundle.com/membership/february-2026" // Adjust this base URL as needed
+    const now = new Date();
+    const monthNames = [
+      "january", "february", "march", "april", "may", "june",
+      "july", "august", "september", "october", "november", "december"
+    ];
+    const currentMonth = monthNames[now.getMonth()];
+    const currentYear = now.getFullYear();
+    const baseUrl = `https://www.humblebundle.com/membership/${currentMonth}-${currentYear}`;
 
     const tilesContainer = doc.querySelector('div.content-choice-tiles.js-content-choice-tiles');
     const tiles = tilesContainer ? Array.from(tilesContainer.querySelectorAll('div.content-choice')) : [];
@@ -224,8 +231,8 @@ clickAllViewMoreButtons().then(() => {
     </body>
     </html>`;
 
-    // Replace <i class="hb hb- with <i class="fa-brands fa- before opening the document
-    html = html.replace(/<i class="hb hb-/g, '<i class="fa-brands fa-');
+    html = html.replace(/<i class="hb hb-steam/g, '<i class="fa-brands fa-steam');
+    html = html.replace(/<i class="hb hb-/g, '<i class="fa fa-');
     win.document.write(html);
     win.document.close();
   }
