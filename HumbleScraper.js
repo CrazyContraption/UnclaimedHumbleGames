@@ -1,4 +1,30 @@
-(async function () {
+function wait(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function clickAllViewMoreButtons() {
+  console.log('Expanding views, please wait - this may take a moment.');
+    const BUTTON_SELECTOR = '.see-more-months';
+    const HIDDEN_CLASS = 'is-hidden';
+    const INTERVAL_MS = 500;
+    const MAX_HIDDEN_COUNT = 8;
+
+    let hiddenCount = 0;
+
+    while (hiddenCount < MAX_HIDDEN_COUNT) {
+        const button = document.querySelector(BUTTON_SELECTOR);
+        if (button && !button.classList.contains(HIDDEN_CLASS)) {
+            button.click();
+            hiddenCount = 0; // Reset if button was visible and clicked
+        } else {
+            hiddenCount++;
+        }
+        await wait(INTERVAL_MS);
+    }
+}
+
+clickAllViewMoreButtons().then(() => {
+  console.log('All views expanded, starting data collection...');
   const links = Array.from(document.querySelectorAll('a.content-choices-footer'));
   const totalTabs = links.length;
   let receivedCount = 0;
@@ -49,45 +75,47 @@
     }
   });
 
-  for (let i = 0; i < links.length; i++) {
-    const link = links[i];
-    const win = window.open(link.href, '_blank');
+  (async function() {
+    for (let i = 0; i < links.length; i++) {
+      const link = links[i];
+      const win = window.open(link.href, '_blank');
 
-    const interval = setInterval(() => {
-      try {
-        if (win.document && win.document.readyState === "complete") {
-          clearInterval(interval);
-          win.eval(`
-            (function() {
-              const monthEl = document.querySelector('h3.content-choices-title');
-              const month = monthEl ? monthEl.textContent.trim() : 'Unknown';
-              const baseUrl = window.location.href.split('#')[0];
-              const tilesContainer = document.querySelector('div.content-choice-tiles.js-content-choice-tiles');
-              const tiles = tilesContainer ? Array.from(tilesContainer.querySelectorAll('div.content-choice')) : [];
+      const interval = setInterval(() => {
+        try {
+          if (win.document && win.document.readyState === "complete") {
+            clearInterval(interval);
+            win.eval(`
+              (function() {
+                const monthEl = document.querySelector('h3.content-choices-title');
+                const month = monthEl ? monthEl.textContent.trim() : 'Unknown';
+                const baseUrl = window.location.href.split('#')[0];
+                const tilesContainer = document.querySelector('div.content-choice-tiles.js-content-choice-tiles');
+                const tiles = tilesContainer ? Array.from(tilesContainer.querySelectorAll('div.content-choice')) : [];
 
-              const items = tiles
-                .filter(el => !el.closest('div.claimed'))
-                .map(el => {
-                  const targetId = el.querySelector('div[id]')?.id;
-                  const wrapper = document.createElement('a');
-                  const cleanId = targetId?.replace(/^choice-/, '');
-                  wrapper.href = baseUrl + '/' + cleanId;
-                  wrapper.target = '_blank';
-                  wrapper.innerHTML = el.outerHTML;
-                  return wrapper.outerHTML;
-                });
+                const items = tiles
+                  .filter(el => !el.closest('div.claimed'))
+                  .map(el => {
+                    const targetId = el.querySelector('div[id]')?.id;
+                    const wrapper = document.createElement('a');
+                    const cleanId = targetId?.replace(/^choice-/, '');
+                    wrapper.href = baseUrl + '/' + cleanId;
+                    wrapper.target = '_blank';
+                    wrapper.innerHTML = el.outerHTML;
+                    return wrapper.outerHTML;
+                  });
 
-              window.opener.postMessage({ type: "${sessionId}", month, payload: items }, "*");
-              window.close();
-            })();
-          `);
-        }
-      } catch (e) {}
+                window.opener.postMessage({ type: "${sessionId}", month, payload: items }, "*");
+                window.close();
+              })();
+            `);
+          }
+        } catch (e) {}
+        window.focus();
+      }, 1500);
       window.focus();
-    }, 1500);
-    window.focus();
-    await new Promise(resolve => setTimeout(resolve, delayMs));
-  }
+      await new Promise(resolve => setTimeout(resolve, delayMs));
+    }
+  })();
 
   function generateHTML(data) {
     const win = window.open('', '_blank');
@@ -197,4 +225,4 @@
     win.document.write(html);
     win.document.close();
   }
-})();
+});
