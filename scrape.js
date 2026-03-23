@@ -30,6 +30,8 @@ const fs = require('fs');
   console.log("✅ Logged in, expanding months...");
 
   // --- Expand all months ---
+  page.on('console', msg => console.log('🌐 Browser:', msg.text()));
+
   await page.evaluate(async () => {
     function wait(ms) {
       return new Promise(resolve => setTimeout(resolve, ms));
@@ -39,18 +41,20 @@ const fs = require('fs');
     const HIDDEN_CLASS = 'is-hidden';
 
     let hiddenCount = 0;
-
+    let count = 0;
     while (hiddenCount < 8) {
       const button = document.querySelector(BUTTON_SELECTOR);
       if (button && !button.classList.contains(HIDDEN_CLASS)) {
-        console.log('👉 Clicking "See More Months" button...');
+        console.log(`👉 Clicking "See More Months" button ${count}...`);
         button.click();
         hiddenCount = 0;
+        count++;
       } else {
         hiddenCount++;
       }
       await wait(500);
     }
+    console.log('👉 No more "See More Months" buttons available.');
   });
 
   console.log("📦 Collecting links...");
@@ -104,7 +108,7 @@ const fs = require('fs');
 
   let current = 1;
   for (const link of links) {
-    console.log(`📄 Extracting ${link}...`);
+    console.log(`(${current}/${links.length}) 📄 Extracting ${link}...`);
     await page.goto(link);
 
     const data = await extract(page);
