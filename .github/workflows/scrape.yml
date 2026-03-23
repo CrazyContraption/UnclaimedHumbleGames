@@ -1,0 +1,53 @@
+name: Humble Scraper
+
+on:
+  workflow_dispatch: # manual trigger
+  schedule:
+    # GitHub cron format: minute hour day month day-of-week
+    # Runs at 06:00 UTC on the first Wednesday of each month
+    # Cron: https://crontab.guru/#0_6_*_*_3
+    # But "first Wednesday" cannot be expressed exactly; run every Wednesday, filter in JS if needed
+    - cron: '0 6 1-7 * 3'  # first Wednesday approximation
+    # Bonus: if first Wednesday can't be deduced, just run on 10th
+    #- cron: '0 6 10 * *'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      # 1️⃣ Checkout the repo
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+
+      # 2️⃣ Setup Node.js
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+
+      # 3️⃣ Install dependencies + Playwright browsers
+      - name: Install Dependencies
+        run: |
+          npm ci
+          npx playwright install --with-deps
+
+      # 4️⃣ Restore Humble auth from secret
+      - name: Restore Humble Auth
+        run: |
+          echo "${{ secrets.HUMBLEAUTHSTATE }}" | base64 --decode > auth.json
+
+      # 5️⃣ Run scraper
+      - name: Run Scraper
+        run: |
+          node scrape.js
+
+      # 6️⃣ Commit and push changes
+      - name: Commit HTML
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git diff-index --quiet HEAD || git commit -m "Update Humble index [ci skip]"
+          git push origin master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
