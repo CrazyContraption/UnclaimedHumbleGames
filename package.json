@@ -1,0 +1,13 @@
+{
+  "name": "humble-scraper",
+  "version": "1.0.0",
+  "main": "scrape.js",
+  "scripts": {
+    "scrape": "node scrape.js",
+    "scraper": "node scrape.js",
+    "auth": "node auth.js"
+  },
+  "dependencies": {
+    "playwright": "^1.42.0"
+  }
+}
