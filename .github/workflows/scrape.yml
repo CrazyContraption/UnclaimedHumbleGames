@@ -65,18 +65,15 @@ jobs:
           
       - name: Clean Branch
         run: |
-          git rm -rf --cached .
-          
-          # Restore index.html to staging
-          git reset index.html
+          # Remove all tracked files from git except index.html and node_modules
+          git ls-files | grep -vE '^(index\.html|node_modules(/|$))' | xargs -r git rm -rf
 
-          # Delete all other files from filesystem
-          shopt -s extglob
-          rm -rf !(index.html)
-          shopt -u extglob
+          # Delete all other files locally except index.html, .git, node_modules
+          find . -mindepth 1 -maxdepth 1 ! -name 'index.html' ! -name '.git' ! -name 'node_modules' -exec rm -rf {} +
 
       - name: Commit Index Diff (if any)
         run: |
+          git add index.html
           if ! git diff --cached --quiet; then
             git commit -m "Update games index"
             git push origin gh-pages --force
