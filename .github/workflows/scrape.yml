@@ -16,37 +16,39 @@ jobs:
   Runner:
     runs-on: ubuntu-latest
     steps:
-      # 1️⃣ Checkout code
-      - name: Checkout
+      - name: 1️⃣ Checkout
         uses: actions/checkout@v3
         with:
           fetch-depth: 0  # required to push to gh-pages
           persist-credentials: true
 
-      # 2️⃣ Setup Node
-      - name: Setup Node
+      - name: 2️⃣ Cache Dependancies
+        uses: actions/cache@v3
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: 3️⃣ Setup Node
         uses: actions/setup-node@v3
         with:
           node-version: 20
 
-      # 3️⃣ Install dependencies
-      - name: Install Dependancies
+      - name: 4️⃣ Install Dependancies
         run: |
           npm install
           npx playwright install --with-deps
 
-      # 4️⃣ Restore Humble auth
-      - name: Retreive Auth State
+      - name: 5️⃣ Retreive Auth State
         run: |
           echo "${{ secrets.HUMBLEAUTHSTATE }}" | base64 --decode > auth.json
 
-      # 5️⃣ Run scraper
-      - name: Scrape Humble Games
+      - name: 6️⃣ Scrape Humble Games
         run: |
           node scrape.js
 
-      # 6️⃣ Switch to gh-pages branch
-      - name: Setup Git Configurations
+      - name: 7️⃣ Setup Branch
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
@@ -54,15 +56,9 @@ jobs:
           git checkout --orphan gh-pages || git checkout gh-pages || git checkout -b gh-pages
           git rm -rf .
 
-      # 7️⃣ Copy generated HTML (or full site) into branch
-      - name: Organize File Structure
+      - name: 8️⃣ Commit Index Diff (if any)
         run: |
-          cp ../index.html ./index.html  # adjust path if needed
           git add index.html
-
-      # 8️⃣ Commit only if changed
-      - name: Commit Index Diff (if any)
-        run: |
           if ! git diff --cached --quiet; then
             git commit -m "Update games index"
             git push origin gh-pages --force
