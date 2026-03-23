@@ -16,13 +16,13 @@ jobs:
   Runner:
     runs-on: ubuntu-latest
     steps:
-      - name: 1️⃣ Checkout
+      - name: Checkout
         uses: actions/checkout@v3
         with:
           fetch-depth: 0  # required to push to gh-pages
           persist-credentials: true
 
-      - name: 2️⃣ Cache Dependancies
+      - name: Cache Node Dependancies
         uses: actions/cache@v3
         with:
           path: node_modules
@@ -30,33 +30,40 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node-
 
-      - name: 3️⃣ Setup Node
+      - name: Cache Playwright Dependancies
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-playwright-
+      
+      - name: Setup Node
         uses: actions/setup-node@v3
         with:
           node-version: 20
 
-      - name: 4️⃣ Install Dependancies
+      - name: Install Dependancies
         run: |
           npm install
           npx playwright install --with-deps
 
-      - name: 5️⃣ Retreive Auth State
+      - name: Retreive Auth State
         run: |
           echo "${{ secrets.HUMBLEAUTHSTATE }}" | base64 --decode > auth.json
 
-      - name: 6️⃣ Scrape Humble Games
+      - name: Scrape Humble Games
         run: |
           node scrape.js
 
-      - name: 7️⃣ Setup Branch
+      - name: Setup Branch
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git fetch origin gh-pages || echo "No gh-pages branch yet"
           git checkout --orphan gh-pages || git checkout gh-pages || git checkout -b gh-pages
-          git rm -rf .
 
-      - name: 8️⃣ Commit Index Diff (if any)
+      - name: Commit Index Diff (if any)
         run: |
           git add index.html
           if ! git diff --cached --quiet; then
