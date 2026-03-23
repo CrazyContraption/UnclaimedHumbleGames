@@ -7,9 +7,7 @@ on:
     # Runs at 06:00 UTC on the first Wednesday of each month
     # Cron: https://crontab.guru/#0_6_*_*_3
     # But "first Wednesday" cannot be expressed exactly; run every Wednesday, filter in JS if needed
-    - cron: '0 6 1-7 * 3'  # first Wednesday approximation
-    # Bonus: if first Wednesday can't be deduced, just run on 10th
-    #- cron: '0 6 10 * *'
+    - cron: '0 6 * * WED'
 
 jobs:
   build:
@@ -40,8 +38,17 @@ jobs:
 
       # 6️⃣ Switch to gh-pages branch
       - run: |
-          git fetch origin gh-pages:gh-pages || git checkout --orphan gh-pages
-          git checkout gh-pages
+          if git ls-remote --exit-code --heads origin gh-pages; then
+            git fetch origin gh-pages:gh-pages
+            git checkout gh-pages
+          else
+            git checkout --orphan gh-pages
+            git rm -rf .
+            touch .gitkeep
+            git add .gitkeep
+            git commit -m "Initial gh-pages commit"
+            git push origin gh-pages
+          fi
 
       # 7️⃣ Copy generated HTML (or full site) into branch
       - run: |
