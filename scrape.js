@@ -42,7 +42,7 @@ const fs = require('fs');
 
     let hiddenCount = 0;
     let count = 1;
-    while (hiddenCount < 8) {
+    while (hiddenCount < 12) {
       const button = document.querySelector(BUTTON_SELECTOR);
       if (button && !button.classList.contains(HIDDEN_CLASS)) {
         console.log(`👉 Clicking "See More Months" button ${count}...`);
