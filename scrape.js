@@ -2,8 +2,10 @@ const { chromium } = require('playwright');
 const fs = require('fs');
 
 (async () => {
+  const isCI = !!process.env.CI || !!process.env.GITHUB_ACTIONS || !!process.env.GITLAB_CI;
+  console.log(`🚀 Starting scraper in ${isCI ? 'headless' : 'headed'} mode...`);
   const browser = await chromium.launch({
-    headless: false // 👈 set to true later for CI
+    headless: isCI
   });
 
   const context = await browser.newContext();
