@@ -61,7 +61,13 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git fetch origin gh-pages || echo "No gh-pages branch yet"
-          git checkout --orphan gh-pages || git checkout gh-pages || git checkout -b gh-pages
+          git checkout --orphan gh-pages || git checkout gh-pages || git checkout -b gh-pages- name: Clean branch except index.html
+          
+      - name: Clean Branch
+        run: |
+          shopt -s extglob  # Enable extended pattern matching
+          rm -rf !(index.html)  # Remove all files except index.html
+          shopt -u extglob  # Disable extended patterns
 
       - name: Commit Index Diff (if any)
         run: |
