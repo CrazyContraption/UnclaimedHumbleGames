@@ -65,13 +65,18 @@ jobs:
           
       - name: Clean Branch
         run: |
-          shopt -s extglob  # Enable extended pattern matching
-          rm -rf !(index.html)  # Remove all files except index.html
-          shopt -u extglob  # Disable extended patterns
+          git rm -rf --cached .
+          
+          # Restore index.html to staging
+          git reset index.html
+
+          # Delete all other files from filesystem
+          shopt -s extglob
+          rm -rf !(index.html)
+          shopt -u extglob
 
       - name: Commit Index Diff (if any)
         run: |
-          git add index.html
           if ! git diff --cached --quiet; then
             git commit -m "Update games index"
             git push origin gh-pages --force
