@@ -13,7 +13,7 @@ permissions:
   contents: write
 
 jobs:
-  build:
+  Runner:
     runs-on: ubuntu-latest
     steps:
       # 1️⃣ Checkout code
