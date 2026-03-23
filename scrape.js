@@ -206,8 +206,18 @@ ${group.items.map(i => `<div class="grid-item">${i}</div>`).join('')}
     <script>
 document.getElementById('searchBox').addEventListener('input', function () {
   const search = this.value.toLowerCase();
-  document.querySelectorAll('.grid-item').forEach(item => {
-    item.classList.toggle('hidden', !item.textContent.toLowerCase().includes(search));
+
+  document.querySelectorAll('section').forEach(section => {
+    const items = section.querySelectorAll('.grid-item');
+    let anyVisible = false;
+
+    items.forEach(item => {
+      const match = item.textContent.toLowerCase().includes(search);
+      item.classList.toggle('hidden', !match);
+      if (match) anyVisible = true;
+    });
+
+    section.style.display = search && !anyVisible ? 'none' : '';
   });
 });
     </script>
