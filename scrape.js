@@ -41,7 +41,7 @@ const fs = require('fs');
     const HIDDEN_CLASS = 'is-hidden';
 
     let hiddenCount = 0;
-    let count = 0;
+    let count = 1;
     while (hiddenCount < 8) {
       const button = document.querySelector(BUTTON_SELECTOR);
       if (button && !button.classList.contains(HIDDEN_CLASS)) {
