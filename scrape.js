@@ -116,7 +116,7 @@ const fs = require('fs');
 
   let current = 1;
   for (const link of links) {
-    console.log(`(${current}/${links.length}) 📄 Extracting ${link}...`);
+    console.log(`(${current}/${links.length}) 📄 Extracting ${link}`);
     await page.goto(link);
 
     const data = await extract(page);
