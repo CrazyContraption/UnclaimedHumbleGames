@@ -42,7 +42,7 @@ const fs = require('fs');
 
     let hiddenCount = 0;
     let count = 1;
-    while (hiddenCount < 12) {
+    while (hiddenCount < 8) {
       const button = document.querySelector(BUTTON_SELECTOR);
       if (button && !button.classList.contains(HIDDEN_CLASS)) {
         console.log(`👉 Clicking "See More Months" button ${count}...`);
@@ -66,8 +66,8 @@ const fs = require('fs');
 
   const collectedData = [];
 
-  async function extract(page) {
-    return await page.evaluate(() => {
+  async function extract(page, baseUrlOverride = null) {
+    return await page.evaluate((baseUrlOverride) => {
       const monthEl = document.querySelector('h3.content-choices-title');
       const month = monthEl ? monthEl.textContent.trim() : 'Unknown';
 
@@ -83,7 +83,8 @@ const fs = require('fs');
         .filter(el => !el.closest('div.claimed'))
         .map(el => {
           const targetId = el.querySelector('div[id]')?.id;
-          const baseUrl = window.location.href.split('#')[0];
+          // Use override if provided, else use current URL
+          const baseUrl = baseUrlOverride || window.location.href.split('#')[0];
           const cleanId = targetId?.replace(/^choice-/, '');
 
           const wrapper = document.createElement('a');
@@ -95,11 +96,18 @@ const fs = require('fs');
         });
 
       return { month, items };
-    });
+    }, baseUrlOverride);
   }
 
+
   console.log("📄 Extracting current page...");
-  const mainData = await extract(page);
+  // Try to get the correct base URL for the first month
+  let firstMonthBaseUrl = null;
+  if (links.length > 0) {
+    // Use the first link, but strip any trailing slash
+    firstMonthBaseUrl = links[0].replace(/\/$/, '');
+  }
+  const mainData = await extract(page, firstMonthBaseUrl);
   if (mainData.items.length > 0) {
     collectedData.push(mainData);
   }
@@ -206,18 +214,8 @@ ${group.items.map(i => `<div class="grid-item">${i}</div>`).join('')}
     <script>
 document.getElementById('searchBox').addEventListener('input', function () {
   const search = this.value.toLowerCase();
-
-  document.querySelectorAll('section').forEach(section => {
-    const items = section.querySelectorAll('.grid-item');
-    let anyVisible = false;
-
-    items.forEach(item => {
-      const match = item.textContent.toLowerCase().includes(search);
-      item.classList.toggle('hidden', !match);
-      if (match) anyVisible = true;
-    });
-
-    section.style.display = search && !anyVisible ? 'none' : '';
+  document.querySelectorAll('.grid-item').forEach(item => {
+    item.classList.toggle('hidden', !item.textContent.toLowerCase().includes(search));
   });
 });
     </script>
