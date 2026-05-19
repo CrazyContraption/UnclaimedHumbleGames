@@ -153,8 +153,8 @@ const fs = require('fs');
       .map(group => `<a href="#${group.month.replace(/\s+/g, '_')}">${group.month}</a>`)
       .join('<br>');
 
-    // Add last updated date
-    const lastUpdated = new Date().toLocaleString();
+    // Add last updated date in EST (America/New_York)
+    const lastUpdated = new Date().toLocaleString('en-US', { timeZone: 'America/New_York', hour12: false });
 
     let html = `<!DOCTYPE html>
 <html>
@@ -238,8 +238,15 @@ ${group.items.map(i => `<div class="grid-item">${i}</div>`).join('')}
     <script>
 document.getElementById('searchBox').addEventListener('input', function () {
   const search = this.value.toLowerCase();
+  // Filter grid items
   document.querySelectorAll('.grid-item').forEach(item => {
     item.classList.toggle('hidden', !item.textContent.toLowerCase().includes(search));
+  });
+  // Hide/show month sections if all their items are hidden
+  document.querySelectorAll('section').forEach(section => {
+    const items = section.querySelectorAll('.grid-item');
+    const anyVisible = Array.from(items).some(item => !item.classList.contains('hidden'));
+    section.style.display = anyVisible ? '' : 'none';
   });
 });
     </script>
