@@ -15,6 +15,7 @@ permissions:
 jobs:
   Runner:
     runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
     steps:
       - name: Checkout
         uses: actions/checkout@v3
