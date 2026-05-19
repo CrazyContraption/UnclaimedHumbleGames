@@ -101,12 +101,18 @@ const fs = require('fs');
 
 
   console.log("📄 Extracting current page...");
-  // Try to get the correct base URL for the first month
+  // Extract the first month to get its name
+  const tempMainData = await extract(page, null);
   let firstMonthBaseUrl = null;
-  if (links.length > 0) {
-    // Use the first link, but strip any trailing slash
-    firstMonthBaseUrl = links[0].replace(/\/$/, '');
+  if (tempMainData && tempMainData.month && tempMainData.month !== 'Unknown') {
+    // Format: /membership/monthname-yearnumber
+    const monthSlug = tempMainData.month
+      .toLowerCase()
+      .replace(/[^a-z0-9 ]/g, '')
+      .replace(/\s+/g, '-');
+    firstMonthBaseUrl = `https://www.humblebundle.com/membership/${monthSlug}`;
   }
+  // Now extract again with the correct base URL
   const mainData = await extract(page, firstMonthBaseUrl);
   if (mainData.items.length > 0) {
     collectedData.push(mainData);
