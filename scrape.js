@@ -105,11 +105,19 @@ const fs = require('fs');
   const tempMainData = await extract(page, null);
   let firstMonthBaseUrl = null;
   if (tempMainData && tempMainData.month && tempMainData.month !== 'Unknown') {
-    // Format: /membership/monthname-yearnumber
-    const monthSlug = tempMainData.month
+    // Format: /membership/monthname-yearnumber (strip any trailing '-games' if present)
+    let monthSlug = tempMainData.month
       .toLowerCase()
       .replace(/[^a-z0-9 ]/g, '')
       .replace(/\s+/g, '-');
+    // Remove everything after and including the second dash, if present
+    const dashIdx = monthSlug.indexOf('-');
+    if (dashIdx !== -1) {
+      const secondDashIdx = monthSlug.indexOf('-', dashIdx + 1);
+      if (secondDashIdx !== -1) {
+        monthSlug = monthSlug.substring(0, secondDashIdx);
+      }
+    }
     firstMonthBaseUrl = `https://www.humblebundle.com/membership/${monthSlug}`;
   }
   // Now extract again with the correct base URL
@@ -137,12 +145,16 @@ const fs = require('fs');
 
   console.log("🧱 Generating HTML...");
 
+
   function generateHTML(data) {
     const filteredData = data.filter(group => group.items.length > 0);
 
     const monthLinks = filteredData
       .map(group => `<a href="#${group.month.replace(/\s+/g, '_')}">${group.month}</a>`)
       .join('<br>');
+
+    // Add last updated date
+    const lastUpdated = new Date().toLocaleString();
 
     let html = `<!DOCTYPE html>
 <html>
@@ -197,6 +209,11 @@ const fs = require('fs');
         top: 0;
         background: #f4f4f4;
       }
+      .last-updated {
+        color: #666;
+        font-size: 0.95em;
+        margin-bottom: 20px;
+      }
     </style>
   </head>
   <body>
@@ -208,6 +225,7 @@ const fs = require('fs');
     </aside>
     <main>
 <h1>Crazy's Unclaimed Humble Games</h1>
+<div class="last-updated">Last updated: ${lastUpdated}</div>
 ${filteredData.map(group => `
 <section id="${group.month.replace(/\s+/g, '_')}">
 <h2>${group.month}</h2>
