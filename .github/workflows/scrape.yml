@@ -9,6 +9,10 @@ on:
     # But "first Wednesday" cannot be expressed exactly; run every Wednesday, filter in JS if needed
     - cron: '0 6 * * WED'
 
+concurrency:
+  group: humble-scraper
+  cancel-in-progress: true
+
 permissions:
   contents: write
 
