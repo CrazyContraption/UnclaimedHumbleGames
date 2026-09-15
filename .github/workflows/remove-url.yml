@@ -1,0 +1,45 @@
+name: Remove Game URL
+
+on:
+  workflow_dispatch:
+    inputs:
+      url:
+        description: URL of the item to remove from the published index
+        required: true
+        type: string
+
+concurrency:
+  group: remove-game-url
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  remove:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout gh-pages
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Prepare published branch
+        run: |
+          cp scripts/remove-url.js "$RUNNER_TEMP/remove-url.js"
+          git fetch origin gh-pages
+          git checkout --detach origin/gh-pages
+
+      - name: Remove item
+        run: node "$RUNNER_TEMP/remove-url.js" "$URL"
+        env:
+          URL: ${{ inputs.url }}
+          INDEX_FILE: ${{ github.workspace }}/index.html
+
+      - name: Commit and push
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git commit -m "Remove game from index"
+          git push origin HEAD:gh-pages
