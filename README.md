@@ -118,7 +118,7 @@ Write-Output $encoded
 
 ### Run locally
 ```bash
-node scrape.js
+npm run scrape
 ```
 - Generates an updated `index.html` in your repository root.  
 - Open `index.html` in your browser to view unclaimed games.  
@@ -130,10 +130,10 @@ The scraper processes the active month separately from previous months and prese
 For a faster test scrape, optionally limit the total number of months, including the current month:
 
 ```bash
-node scrape.js --months=2
+node scripts/scrape.js --months=2
 ```
 
-The limit includes the active month. For example, `--months=2` processes the active month plus one previous month. The equivalent spaced form, `node scrape.js --months 2`, is also supported. The default is unlimited and scrapes all available months.
+The limit includes the active month. For example, `--months=2` processes the active month plus one previous month. The equivalent spaced form, `node scripts/scrape.js --months 2`, is also supported. The default is unlimited and scrapes all available months.
 
 ---
 
@@ -154,6 +154,20 @@ The limit includes the active month. For example, `--months=2` processes the act
   4. Generate the HTML page  
   5. Commit to `gh-pages` branch only if `index.html` changed  
   6. Push updates to GitHub Pages
+
+### Remove an item from the published index
+
+To remove one item without running the scraper:
+
+1. Open **Actions > Remove Game URL > Run workflow**.
+2. Enter the item's full URL exactly as it appears in the published page.
+3. Run the workflow.
+
+The workflow checks out `gh-pages`, removes the matching item from `index.html`, and pushes the change back to GitHub Pages. Locally, the equivalent command is:
+
+```bash
+npm run remove-url -- "https://www.humblebundle.com/membership/..."
+```
 
 ---
 

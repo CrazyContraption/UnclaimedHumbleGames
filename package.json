@@ -1,12 +1,13 @@
 {
   "name": "humble-scraper",
   "version": "1.0.0",
-  "main": "scrape.js",
+  "main": "scripts/scrape.js",
   "scripts": {
-    "scrape": "node scrape.js",
-    "scraper": "node scrape.js",
-    "preview": "node preview.js",
-    "auth": "node auth.js"
+    "scrape": "node scripts/scrape.js",
+    "scraper": "node scripts/scrape.js",
+    "remove-url": "node scripts/remove-url.js",
+    "preview": "node scripts/preview.js",
+    "auth": "node scripts/auth.js"
   },
   "dependencies": {
     "playwright": "^1.42.0"

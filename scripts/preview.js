@@ -1,23 +1,25 @@
 // preview.js
 // Generates a preview HTML file using the modern template and real/sample data.
-// Usage: node preview.js [input.json] [output.html]
+// Usage: node scripts/preview.js [input.json] [output.html]
 
 const fs = require('fs');
 const path = require('path');
 
+const repoRoot = path.join(__dirname, '..');
 const input = process.argv[2];
-const output = process.argv[3] || 'preview.html';
+const inputPath = input ? path.resolve(repoRoot, input) : null;
+const output = path.resolve(repoRoot, process.argv[3] || 'preview.html');
 
 // Generate data: use provided file, extract from index.html, or use realistic defaults
 let data;
 
-if (input && fs.existsSync(input)) {
+if (inputPath && fs.existsSync(inputPath)) {
   // Use provided JSON input
-  data = JSON.parse(fs.readFileSync(input, 'utf-8'));
-} else if (fs.existsSync(path.join(__dirname, 'index.html'))) {
+  data = JSON.parse(fs.readFileSync(inputPath, 'utf-8'));
+} else if (fs.existsSync(path.join(repoRoot, 'index.html'))) {
   // Try to extract data from generated index.html
   try {
-    const indexHtml = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf-8');
+    const indexHtml = fs.readFileSync(path.join(repoRoot, 'index.html'), 'utf-8');
     const match = indexHtml.match(/window\.UNCLAIMED_HUMBLE_GAMES = (\[[\s\S]*?\]);/);
     if (match && match[1]) {
       data = JSON.parse(match[1]);
@@ -151,7 +153,7 @@ function generateRealisticSampleData() {
 }
 
 // Use the same HTML generation as scrape.js (modern template + data injection)
-const templatePath = path.join(__dirname, 'modern_template.html');
+const templatePath = path.join(repoRoot, 'modern_template.html');
 let template = fs.readFileSync(templatePath, 'utf-8');
 const updatedAt = new Date().toISOString();
 const injectScript = `<script>window.UNCLAIMED_HUMBLE_GAMES = ${JSON.stringify(data)}; window.UNCLAIMED_HUMBLE_GAMES_UPDATED_AT = ${JSON.stringify(updatedAt)};</script>`;

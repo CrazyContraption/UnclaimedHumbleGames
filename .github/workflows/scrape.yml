@@ -55,7 +55,7 @@ jobs:
 
       - name: Scrape Humble Games
         run: |
-          node scrape.js
+          node scripts/scrape.js
 
       - name: Setup Branch
         run: |
