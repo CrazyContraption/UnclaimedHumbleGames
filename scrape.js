@@ -317,11 +317,24 @@ function readMonthLimit(args) {
 
 
   console.log("📄 Extracting current page...");
-  // Try to get the correct base URL for the first month
+  // Extract the first month to get its name
+  const tempMainData = await extract(page, null);
   let firstMonthBaseUrl = null;
-  if (links.length > 0) {
-    // Use the first link, but strip any trailing slash
-    firstMonthBaseUrl = links[0].replace(/\/$/, '');
+  if (tempMainData && tempMainData.month && tempMainData.month !== 'Unknown') {
+    // Format: /membership/monthname-yearnumber (strip any trailing '-games' if present)
+    let monthSlug = tempMainData.month
+      .toLowerCase()
+      .replace(/[^a-z0-9 ]/g, '')
+      .replace(/\s+/g, '-');
+    // Remove everything after and including the second dash, if present
+    const dashIdx = monthSlug.indexOf('-');
+    if (dashIdx !== -1) {
+      const secondDashIdx = monthSlug.indexOf('-', dashIdx + 1);
+      if (secondDashIdx !== -1) {
+        monthSlug = monthSlug.substring(0, secondDashIdx);
+      }
+    }
+    firstMonthBaseUrl = `https://www.humblebundle.com/membership/${monthSlug}`;
   }
   // Keep the landing-page scan isolated from the page used to expand and collect month links.
   const landingPage = await context.newPage();
