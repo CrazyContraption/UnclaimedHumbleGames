@@ -8,10 +8,17 @@ This repository automatically generates a browsable index of your **unclaimed Hu
 
 - Automatically expands all Humble Choice months and collects **unclaimed games**.
 - Generates a static `index.html` page with:
-  - Sidebar **search box** to filter games
+  - Sticky sidebar **search and filter controls**
+  - Searchable multi-select **genre filter**
   - Jump-to-month navigation
   - Responsive grid layout
-  - Platform icons (Steam, Epic, etc.)
+  - Platform icons and expiration indicators
+  - Last-updated timestamp
+- Scrapes modal details for each unclaimed game:
+  - Genres and platform
+  - Redemption deadlines
+  - Vanity links
+- Skips claimed, expired, unpaid, and empty months.
 - GitHub Actions integration for:
   - Automatic monthly updates (first Wednesday or fallback on the 10th)
   - Manual workflow dispatch
@@ -28,19 +35,25 @@ This repository automatically generates a browsable index of your **unclaimed Hu
 2. **Browser Automation**  
    Playwright launches a headless or visible browser, opens Humble Bundle, expands all available months, and collects unclaimed games.
 
-3. **HTML Generation**  
+3. **Game Detail Extraction**  
+  Each unclaimed game is opened in its modal to collect genre, platform, redemption deadline, and vanity URL data. Expired games are excluded from the results.
+
+4. **HTML Generation**  
    Your collected games are rendered into a **custom HTML page** with:
    - A sidebar search box
+  - Sticky search and filter controls
+  - Searchable multi-select genre filtering
    - Jump-to-month links
    - Responsive grid of game tiles
+  - Platform and expiration metadata
    - Hover effects and links to Humble pages
 
-4. **GitHub Actions Integration**  
+5. **GitHub Actions Integration**  
    - Automatically runs once a month on a scheduled cron job (first Wednesday approximation or the 10th if needed)  
    - Can also be run manually using `workflow_dispatch`  
    - Commits the updated `index.html` to a separate branch (`gh-pages`) only if there are changes
 
-5. **GitHub Pages Deployment**  
+6. **GitHub Pages Deployment**  
    The `gh-pages` branch serves the site via GitHub Pages, giving you a live, browsable index of your unclaimed games.
 
 ---
@@ -104,13 +117,23 @@ Write-Output $encoded
 ## Usage
 
 ### Run locally
-
+```bash
 node scrape.js
-
+```
 - Generates an updated `index.html` in your repository root.  
 - Open `index.html` in your browser to view unclaimed games.  
 - Sidebar search box filters games dynamically.  
 - Month links in the sidebar allow navigation to a specific month.
+
+The scraper processes the active month separately from previous months and preserves month and game order. Claimed games are skipped before modal extraction, while expired games and months with no remaining items are excluded.
+
+For a faster test scrape, optionally limit the total number of months, including the current month:
+
+```bash
+node scrape.js --months=2
+```
+
+The limit includes the active month. For example, `--months=2` processes the active month plus one previous month. The equivalent spaced form, `node scrape.js --months 2`, is also supported. The default is unlimited and scrapes all available months.
 
 ---
 
@@ -149,14 +172,14 @@ https://<username>.github.io/<repo>/
 ## Development Notes
 
 - Playwright runs **headless in CI** and **headed locally** for easier debugging.  
-- Sidebar search, month navigation, and hover effects are baked into the generated HTML.  
+- Sidebar search, sticky filters, month navigation, genre selection, and hover effects are baked into the generated HTML.  
+- The generated page includes the scrape timestamp and displays expiration indicators when a redemption deadline is found.  
 - The workflow will **skip commits** if `index.html` has not changed, preventing unnecessary rebuilds.
 
 ---
 
 ## Optional Improvements
 
-- Display **last updated timestamp** on the page.  
 - Highlight new months or recently added games.  
 - Include additional metadata (platform, rating, etc.)  
 - Separate CSS or JS for easier customization.
