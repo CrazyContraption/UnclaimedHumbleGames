@@ -5,6 +5,7 @@
   "scripts": {
     "scrape": "node scrape.js",
     "scraper": "node scrape.js",
+    "preview": "node preview.js",
     "auth": "node auth.js"
   },
   "dependencies": {
