@@ -23,19 +23,19 @@
     #searchBox:focus + #clearSearchBtn, #searchBox:not(:placeholder-shown) + #clearSearchBtn { display: block; }
     .filter-select { width: 100%; padding: 10px; font-size: 16px; margin-bottom: 16px; border: 1px solid #d1d5db; border-radius: 8px; background: #f3f4f6; transition: all 0.2s; cursor: pointer; }
     .filter-select[multiple] { min-height: 116px; padding: 6px; }
-    .genre-picker { position: relative; margin-bottom: 16px; }
-    .genre-picker-toggle { width: 100%; min-height: 42px; padding: 8px 10px; border: 1px solid #d1d5db; border-radius: 8px; background: #f3f4f6; color: #222; text-align: left; cursor: pointer; }
-    .genre-picker-toggle:focus { outline: none; border-color: #667eea; box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1); }
-    .genre-picker-menu { position: absolute; top: calc(100% + 4px); left: 0; right: 0; padding: 8px; background: #fff; border: 1px solid #d1d5db; border-radius: 8px; box-shadow: 0 8px 20px rgba(0,0,0,0.15); z-index: 20; }
-    .genre-picker-menu[hidden] { display: none; }
-    .genre-picker-search { width: 100%; padding: 8px; margin-bottom: 6px; border: 1px solid #d1d5db; border-radius: 6px; }
-    .genre-picker-options { max-height: 180px; overflow-y: auto; display: grid; gap: 2px; }
-    .genre-picker-option { display: flex; gap: 8px; align-items: center; padding: 7px 6px; border-radius: 5px; cursor: pointer; }
-    .genre-picker-option:hover { background: #f3f4f6; }
-    .genre-picker-chips { display: flex; flex-wrap: wrap; gap: 4px; }
-    .genre-picker-chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 7px; border-radius: 10px; background: #fff; color: #4b5563; border: 1px solid #9ca3af; font-size: 0.85em; }
-    .genre-picker-chip button { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; border: 0; border-radius: 50%; padding: 0; background: #e5e7eb; color: #4b5563; cursor: pointer; font-size: 1.1em; line-height: 1; }
-    .genre-picker-chip button:hover { background: #d1d5db; color: #111827; }
+    .filter-picker { position: relative; margin-bottom: 16px; }
+    .filter-picker-toggle { width: 100%; min-height: 42px; padding: 8px 10px; border: 1px solid #d1d5db; border-radius: 8px; background: #f3f4f6; color: #222; text-align: left; cursor: pointer; }
+    .filter-picker-toggle:focus { outline: none; border-color: #667eea; box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1); }
+    .filter-picker-menu { position: absolute; top: calc(100% + 4px); left: 0; right: 0; padding: 8px; background: #fff; border: 1px solid #d1d5db; border-radius: 8px; box-shadow: 0 8px 20px rgba(0,0,0,0.15); z-index: 20; }
+    .filter-picker-menu[hidden] { display: none; }
+    .filter-picker-search { width: 100%; padding: 8px; margin-bottom: 6px; border: 1px solid #d1d5db; border-radius: 6px; }
+    .filter-picker-options { max-height: 180px; overflow-y: auto; display: grid; gap: 2px; }
+    .filter-picker-option { display: flex; gap: 8px; align-items: center; padding: 7px 6px; border-radius: 5px; cursor: pointer; }
+    .filter-picker-option:hover { background: #f3f4f6; }
+    .filter-picker-chips { display: flex; flex-wrap: wrap; gap: 4px; }
+    .filter-picker-chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 7px; border-radius: 10px; background: #fff; color: #4b5563; border: 1px solid #9ca3af; font-size: 0.85em; }
+    .filter-picker-chip button { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; border: 0; border-radius: 50%; padding: 0; background: #e5e7eb; color: #4b5563; cursor: pointer; font-size: 1.1em; line-height: 1; }
+    .filter-picker-chip button:hover { background: #d1d5db; color: #111827; }
     .filter-select:hover { background: #e5e7eb; }
     .filter-select:focus { outline: none; background: #fff; border-color: #667eea; box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1); }
     .filters { margin-bottom: 32px; }
@@ -111,17 +111,31 @@
         <button id="clearSearchBtn" title="Clear search">&times;</button>
       </div>
       <div class="filters">
-        <select id="platformFilter" class="filter-select">
-          <option value="">All Platforms</option>
-        </select>
-        <select id="typeFilter" class="filter-select">
-          <option value="">All Types</option>
-        </select>
-        <div class="genre-picker" id="genrePicker">
-          <div class="genre-picker-toggle" id="genrePickerToggle" role="button" tabindex="0" aria-haspopup="listbox" aria-expanded="false">All Genres</div>
-          <div class="genre-picker-menu" id="genrePickerMenu" hidden>
-            <input type="search" class="genre-picker-search" id="genrePickerSearch" placeholder="Search genres..." aria-label="Search genres">
-            <div class="genre-picker-options" id="genrePickerOptions" role="listbox"></div>
+        <div class="filter-picker" id="platformPicker">
+          <div class="filter-picker-toggle" id="platformPickerToggle" role="button" tabindex="0" aria-haspopup="listbox" aria-expanded="false">All Platforms</div>
+          <div class="filter-picker-menu" id="platformPickerMenu" hidden>
+            <input type="search" class="filter-picker-search" id="platformPickerSearch" placeholder="Search platforms..." aria-label="Search platforms">
+            <div class="filter-picker-options" id="platformPickerOptions" role="listbox"></div>
+          </div>
+          <select id="platformFilter" class="filter-select" multiple aria-label="Filter by one or more platforms" hidden>
+            <option value="">All Platforms</option>
+          </select>
+        </div>
+        <div class="filter-picker" id="typePicker">
+          <div class="filter-picker-toggle" id="typePickerToggle" role="button" tabindex="0" aria-haspopup="listbox" aria-expanded="false">All Types</div>
+          <div class="filter-picker-menu" id="typePickerMenu" hidden>
+            <input type="search" class="filter-picker-search" id="typePickerSearch" placeholder="Search types..." aria-label="Search types">
+            <div class="filter-picker-options" id="typePickerOptions" role="listbox"></div>
+          </div>
+          <select id="typeFilter" class="filter-select" multiple aria-label="Filter by one or more types" hidden>
+            <option value="">All Types</option>
+          </select>
+        </div>
+        <div class="filter-picker" id="genrePicker">
+          <div class="filter-picker-toggle" id="genrePickerToggle" role="button" tabindex="0" aria-haspopup="listbox" aria-expanded="false">All Genres</div>
+          <div class="filter-picker-menu" id="genrePickerMenu" hidden>
+            <input type="search" class="filter-picker-search" id="genrePickerSearch" placeholder="Search genres..." aria-label="Search genres">
+            <div class="filter-picker-options" id="genrePickerOptions" role="listbox"></div>
           </div>
           <select id="genreFilter" class="filter-select" multiple aria-label="Filter by one or more genres" hidden>
             <option value="">All Genres</option>
@@ -207,65 +221,101 @@
       return value.split(/[\s_-]+/).map(word => word ? word.charAt(0).toUpperCase() + word.slice(1) : word).join(' ');
     }
 
+    function splitFilterValues(value) {
+      const values = Array.isArray(value) ? value : [value || ''];
+      return values.flatMap(entry => String(entry).split(',')).map(entry => entry.trim().toLowerCase()).filter(Boolean);
+    }
+
+    const filterPickerDefinitions = [
+      {
+        selectId: 'platformFilter',
+        pickerId: 'platformPicker',
+        emptyLabel: 'All Platforms',
+        getValues: item => splitFilterValues(item.platform)
+      },
+      {
+        selectId: 'typeFilter',
+        pickerId: 'typePicker',
+        emptyLabel: 'All Types',
+        getValues: item => isSubscription(item) ? ['subscription'] : splitFilterValues(item.type)
+      },
+      {
+        selectId: 'genreFilter',
+        pickerId: 'genrePicker',
+        emptyLabel: 'All Genres',
+        getValues: item => splitFilterValues(item.type).includes('game') ? splitFilterValues(item.genre) : []
+      }
+    ];
+
     function populateFilterOptions() {
       const items = DATA.flatMap(group => group.items || []);
-      const filterDefinitions = [
-        {
-          id: 'platformFilter',
-          emptyLabel: 'All Platforms',
-          getValue: item => (item.platform || '').trim().toLowerCase()
-        },
-        {
-          id: 'typeFilter',
-          emptyLabel: 'All Types',
-          getValue: item => isSubscription(item) ? 'subscription' : (item.type || '').trim().toLowerCase()
-        },
-        {
-          id: 'genreFilter',
-          emptyLabel: 'All Genres',
-          getValue: item => item.type?.trim().toLowerCase() === 'game' ? (Array.isArray(item.genre) ? item.genre : [item.genre || '']).map(value => value.trim().toLowerCase()) : []
-        }
-      ];
-
-      filterDefinitions.forEach(({ id, emptyLabel, getValue }) => {
-        const select = document.getElementById(id);
-        const values = [...new Set(items.flatMap(getValue).filter(Boolean))].sort((a, b) => a.localeCompare(b));
-        select.replaceChildren(new Option(emptyLabel, ''));
+      filterPickerDefinitions.forEach(definition => {
+        const select = document.getElementById(definition.selectId);
+        const values = [...new Set(items.flatMap(definition.getValues))].sort((a, b) => a.localeCompare(b));
+        select.replaceChildren(new Option(definition.emptyLabel, ''));
         values.forEach(value => select.add(new Option(formatFilterValue(value), value)));
+        renderFilterPicker(definition);
       });
-
-      renderGenrePicker();
     }
 
-    function renderGenrePicker() {
-      const select = document.getElementById('genreFilter');
-      const optionsContainer = document.getElementById('genrePickerOptions');
+    function renderFilterPicker(definition) {
+      const select = document.getElementById(definition.selectId);
+      const optionsContainer = document.getElementById(`${definition.pickerId}Options`);
       const selectedValues = new Set([...select.selectedOptions].map(option => option.value).filter(Boolean));
-      optionsContainer.innerHTML = [...select.options].slice(1).map(option => `
-        <label class="genre-picker-option">
-          <input type="checkbox" value="${option.value}" ${selectedValues.has(option.value) ? 'checked' : ''}>
-          <span>${option.textContent}</span>
-        </label>
-      `).join('') || '<span class="genre-picker-option">No genres available</span>';
-      updateGenrePickerLabel();
+      optionsContainer.replaceChildren();
+      [...select.options].slice(1).forEach(option => {
+        const label = document.createElement('label');
+        label.className = 'filter-picker-option';
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.value = option.value;
+        checkbox.checked = selectedValues.has(option.value);
+        const text = document.createElement('span');
+        text.textContent = option.textContent;
+        label.append(checkbox, text);
+        optionsContainer.append(label);
+      });
+      if (!optionsContainer.children.length) {
+        const emptyMessage = document.createElement('span');
+        emptyMessage.className = 'filter-picker-option';
+        emptyMessage.textContent = 'No options available';
+        optionsContainer.append(emptyMessage);
+      }
+      updateFilterPickerLabel(definition);
     }
 
-    function updateGenrePickerLabel() {
-      const select = document.getElementById('genreFilter');
-      const toggle = document.getElementById('genrePickerToggle');
+    function updateFilterPickerLabel(definition) {
+      const select = document.getElementById(definition.selectId);
+      const toggle = document.getElementById(`${definition.pickerId}Toggle`);
       const selected = [...select.selectedOptions].filter(option => option.value);
       if (!selected.length) {
-        toggle.textContent = 'All Genres';
+        toggle.textContent = definition.emptyLabel;
         return;
       }
-      toggle.innerHTML = `<span class="genre-picker-chips">${selected.map(option => `<span class="genre-picker-chip">${option.textContent}<button type="button" data-remove-genre="${option.value}" aria-label="Remove ${option.textContent}">&times;</button></span>`).join('')}</span>`;
+      const chips = document.createElement('span');
+      chips.className = 'filter-picker-chips';
+      selected.forEach(option => {
+        const chip = document.createElement('span');
+        chip.className = 'filter-picker-chip';
+        const text = document.createElement('span');
+        text.textContent = option.textContent;
+        const removeButton = document.createElement('button');
+        removeButton.type = 'button';
+        removeButton.dataset.removeValue = option.value;
+        removeButton.setAttribute('aria-label', `Remove ${option.textContent}`);
+        removeButton.textContent = '×';
+        chip.append(text, removeButton);
+        chips.append(chip);
+      });
+      toggle.replaceChildren(chips);
     }
 
-    function applyGenrePickerSelection() {
-      const select = document.getElementById('genreFilter');
-      const checkedValues = new Set([...document.querySelectorAll('#genrePickerOptions input:checked')].map(input => input.value));
+    function applyFilterPickerSelection(definition) {
+      const select = document.getElementById(definition.selectId);
+      const options = document.getElementById(`${definition.pickerId}Options`);
+      const checkedValues = new Set([...options.querySelectorAll('input:checked')].map(input => input.value));
       [...select.options].forEach(option => { option.selected = option.value ? checkedValues.has(option.value) : checkedValues.size === 0; });
-      updateGenrePickerLabel();
+      updateFilterPickerLabel(definition);
       applyFilters();
     }
 
@@ -373,8 +423,9 @@
     // --- Filtering ---
     function applyFilters() {
       const search = document.getElementById('searchBox').value.toLowerCase();
-      const platformFilter = document.getElementById('platformFilter').value.toLowerCase();
-      const typeFilter = document.getElementById('typeFilter').value.toLowerCase();
+      const getSelectedValues = id => [...document.getElementById(id).selectedOptions].map(option => option.value).filter(Boolean);
+      const platformFilters = getSelectedValues('platformFilter');
+      const typeFilters = getSelectedValues('typeFilter');
       const genreFilter = [...document.getElementById('genreFilter').selectedOptions].map(option => option.value.toLowerCase()).filter(Boolean);
       
       const filtered = DATA.map(group => {
@@ -387,25 +438,19 @@
           }
           
           // Platform filter
-          if (platformFilter) {
-            const itemPlatform = (item.platform || '').toLowerCase();
-            if (itemPlatform !== platformFilter) {
-              show = false;
-            }
+          if (platformFilters.length && !splitFilterValues(item.platform).some(platform => platformFilters.includes(platform))) {
+            show = false;
           }
           
           // Type filter with subscription detection
-          if (typeFilter) {
-            const itemType = isSubscription(item) ? 'subscription' : (item.type || '').toLowerCase();
-            if (itemType !== typeFilter) {
-              show = false;
-            }
+          const itemTypes = isSubscription(item) ? ['subscription'] : splitFilterValues(item.type);
+          if (typeFilters.length && !itemTypes.some(type => typeFilters.includes(type))) {
+            show = false;
           }
           
           // Genre filter
           if (genreFilter.length) {
-            const itemGenres = Array.isArray(item.genre) ? item.genre : (item.genre ? [item.genre] : []);
-            if (!itemGenres.some(genre => genreFilter.includes(genre.toLowerCase()))) {
+            if (!splitFilterValues(item.genre).some(genre => genreFilter.includes(genre))) {
               show = false;
             }
           }
@@ -445,44 +490,47 @@
       document.getElementById('searchBox').focus();
     });
     
-    document.getElementById('platformFilter').addEventListener('change', applyFilters);
-    document.getElementById('typeFilter').addEventListener('change', applyFilters);
-    document.getElementById('genrePickerToggle').addEventListener('click', () => {
-      const menu = document.getElementById('genrePickerMenu');
-      const isOpen = menu.hasAttribute('hidden');
-      menu.toggleAttribute('hidden', !isOpen);
-      document.getElementById('genrePickerToggle').setAttribute('aria-expanded', String(isOpen));
-      if (isOpen) document.getElementById('genrePickerSearch').focus();
-    });
-    document.getElementById('genrePickerToggle').addEventListener('keydown', event => {
-      if (event.key === 'Enter' || event.key === ' ') {
-        event.preventDefault();
-        event.currentTarget.click();
-      }
-    });
-    document.getElementById('genrePickerOptions').addEventListener('change', applyGenrePickerSelection);
-    document.getElementById('genrePickerSearch').addEventListener('input', event => {
-      const query = event.target.value.toLowerCase();
-      document.querySelectorAll('#genrePickerOptions .genre-picker-option').forEach(option => {
-        option.hidden = !option.textContent.toLowerCase().includes(query);
+    filterPickerDefinitions.forEach(definition => {
+      const picker = document.getElementById(definition.pickerId);
+      const toggle = document.getElementById(`${definition.pickerId}Toggle`);
+      const menu = document.getElementById(`${definition.pickerId}Menu`);
+      const search = document.getElementById(`${definition.pickerId}Search`);
+      const options = document.getElementById(`${definition.pickerId}Options`);
+      toggle.addEventListener('click', event => {
+        const removeButton = event.target.closest('[data-remove-value]');
+        if (removeButton) {
+          event.stopPropagation();
+          const checkbox = [...options.querySelectorAll('input')].find(input => input.value === removeButton.dataset.removeValue);
+          if (checkbox) {
+            checkbox.checked = false;
+            applyFilterPickerSelection(definition);
+          }
+          return;
+        }
+        const isOpen = menu.hasAttribute('hidden');
+        menu.toggleAttribute('hidden', !isOpen);
+        toggle.setAttribute('aria-expanded', String(isOpen));
+        if (isOpen) search.focus();
       });
-    });
-    document.getElementById('genrePickerToggle').addEventListener('click', event => {
-      const removeButton = event.target.closest('[data-remove-genre]');
-      if (!removeButton) return;
-      event.stopPropagation();
-      const checkbox = document.querySelector(`#genrePickerOptions input[value="${CSS.escape(removeButton.dataset.removeGenre)}"]`);
-      if (checkbox) {
-        checkbox.checked = false;
-        applyGenrePickerSelection();
-      }
-    });
-    document.addEventListener('click', event => {
-      const picker = document.getElementById('genrePicker');
-      if (!picker.contains(event.target)) {
-        document.getElementById('genrePickerMenu').setAttribute('hidden', '');
-        document.getElementById('genrePickerToggle').setAttribute('aria-expanded', 'false');
-      }
+      toggle.addEventListener('keydown', event => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          event.currentTarget.click();
+        }
+      });
+      options.addEventListener('change', () => applyFilterPickerSelection(definition));
+      search.addEventListener('input', event => {
+        const query = event.target.value.toLowerCase();
+        options.querySelectorAll('.filter-picker-option').forEach(option => {
+          option.hidden = !option.textContent.toLowerCase().includes(query);
+        });
+      });
+      document.addEventListener('click', event => {
+        if (!picker.contains(event.target)) {
+          menu.setAttribute('hidden', '');
+          toggle.setAttribute('aria-expanded', 'false');
+        }
+      });
     });
 
     const lastUpdatedDate = new Date(window.UNCLAIMED_HUMBLE_GAMES_UPDATED_AT || document.lastModified);
