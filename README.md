@@ -18,7 +18,8 @@ This repository automatically generates a browsable index of your **unclaimed Hu
   - Genres and platform
   - Redemption deadlines
   - Vanity links
-- Skips claimed, expired, unpaid, and empty months.
+- Excludes claimed and expired games, and skips unpaid or empty months.
+- Detects paid months using the visible “Select games” button or claimed-game markers, then checks the first unclaimed game's modal for a disabled “Select this game” action as a fallback.
 - GitHub Actions integration for:
   - Automatic monthly updates (first Wednesday or fallback on the 10th)
   - Manual workflow dispatch
@@ -126,7 +127,7 @@ npm run scrape
 - Sidebar search box filters games dynamically.  
 - Month links in the sidebar allow navigation to a specific month.
 
-The scraper processes the active month separately from previous months and preserves month and game order. Claimed games are skipped before modal extraction, while expired games and months with no remaining items are excluded.
+The scraper processes the active month separately from previous months and preserves month and game order. It recognizes paid months using the “Select games” button or claimed-game markers when present. If neither appears, it checks the first unclaimed game's modal and skips the month when “Select this game” is disabled. Claimed games are skipped before modal extraction, while expired games and months with no remaining items are excluded.
 
 For a faster test scrape, optionally limit the total number of months, including the current month:
 

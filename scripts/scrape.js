@@ -3,6 +3,7 @@ const fs = require('fs');
 const path = require('path');
 
 const repoRoot = path.join(__dirname, '..');
+let browser;
 
 function readMonthLimit(args) {
   const inlineValue = args.find(arg => arg.startsWith('--months='));
@@ -16,7 +17,7 @@ function readMonthLimit(args) {
   const monthLimit = readMonthLimit(process.argv.slice(2));
   const isCI = !!process.env.CI || !!process.env.GITHUB_ACTIONS || !!process.env.GITLAB_CI;
   console.log(`🚀 Starting scraper in ${isCI ? 'headless' : 'headed'} mode${monthLimit ? ` (max ${monthLimit} months)` : ''}...`);
-  const browser = await chromium.launch({
+  browser = await chromium.launch({
     headless: isCI
   });
 
@@ -242,6 +243,42 @@ function readMonthLimit(args) {
     }));
   }
 
+  async function hasClaimedGames(targetPage) {
+    return (await targetPage.locator('div.content-choice.claimed').count()) > 0;
+  }
+
+  async function hasDisabledSelectGameAction(targetPage) {
+    const firstGameButton = targetPage.locator('div.content-choice:not(.claimed) .js-open-choice-modal').first();
+    if (!(await firstGameButton.count())) return null;
+
+    await firstGameButton.click();
+    const modal = targetPage.locator('.humblemodal-modal.humblemodal-modal--open');
+    await modal.waitFor({ state: 'visible', timeout: 10000 });
+
+    try {
+      return await modal.evaluate(element => {
+        const action = [...element.querySelectorAll('a, button, [role="button"]')].find(candidate =>
+          candidate.textContent.replace(/\s+/g, ' ').trim().toLowerCase() === 'select this game'
+        );
+        if (!action) return false;
+
+        return action.hasAttribute('disabled')
+          || action.getAttribute('aria-disabled') === 'true'
+          || action.classList.contains('disabled');
+      });
+    } finally {
+      await modal.locator('.js-close-modal').click();
+      await modal.waitFor({ state: 'hidden', timeout: 10000 });
+    }
+  }
+
+  async function isPurchasedMonth(targetPage) {
+    if (await hasSelectGamesButton(targetPage) || await hasClaimedGames(targetPage)) return true;
+
+    const hasDisabledAction = await hasDisabledSelectGameAction(targetPage);
+    return hasDisabledAction === null ? false : !hasDisabledAction;
+  }
+
   async function enrichItemsFromModals(targetPage, data) {
     const tileButtons = targetPage.locator('div.content-choice:not(.claimed) .js-open-choice-modal');
     const itemCount = await tileButtons.count();
@@ -345,13 +382,13 @@ function readMonthLimit(args) {
   await landingPage.waitForLoadState('networkidle').catch(() => {});
 
   console.log(`(1/${monthLimit || links.length + 1}) 📄 Extracting active month...`);
-  if (await hasSelectGamesButton(landingPage)) {
+  if (await isPurchasedMonth(landingPage)) {
     const mainData = await enrichItemsFromModals(landingPage, await extract(landingPage, firstMonthBaseUrl));
     if (mainData.items.length > 0) {
       collectedData.push(mainData);
     }
   } else {
-    console.log('⚠️ Skipping initial month because it has no visible "Select games" button.');
+    console.log('⚠️ Skipping initial month because no purchase marker was found.');
   }
   await landingPage.close();
 
@@ -377,8 +414,8 @@ function readMonthLimit(args) {
         // Create a new page for this concurrent request
         const tempPage = await context.newPage();
         await tempPage.goto(link);
-        if (!(await hasSelectGamesButton(tempPage))) {
-          console.log(`(${index + 2}/${totalMonths}) ⚠️ Skipping unpaid month without a visible "Select games" button.`);
+        if (!(await isPurchasedMonth(tempPage))) {
+          console.log(`(${index + 2}/${totalMonths}) ⚠️ Skipping unpaid month without a purchase marker.`);
           await tempPage.close();
           return { index, data: null };
         }
