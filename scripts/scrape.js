@@ -36,7 +36,7 @@ function readMonthLimit(args) {
 
   // --- Validate auth ---
   if (page.url().includes('login')) {
-    throw new Error('AUTH_EXPIRED');
+    throw new Error('HUMBLE_AUTH_EXPIRED: Humble redirected to login. Refresh the browser auth state and update HUMBLEAUTHSTATE.');
   }
 
   console.log("✅ Logged in, expanding months...");
@@ -433,4 +433,14 @@ function readMonthLimit(args) {
 
   await browser.close();
 
-})();
+})().catch(async error => {
+  console.error(`❌ Scraper failed: ${error.message}`);
+  if (browser) {
+    try {
+      await browser.close();
+    } catch (closeError) {
+      console.error(`❌ Could not close browser after scraper failure: ${closeError.message}`);
+    }
+  }
+  process.exitCode = 1;
+});

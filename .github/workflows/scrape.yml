@@ -53,9 +53,16 @@ jobs:
           npm install
           npx playwright install --with-deps
 
-      - name: Retreive Auth State
+      - name: Retrieve Auth State
+        env:
+          HUMBLEAUTHSTATE: ${{ secrets.HUMBLEAUTHSTATE }}
         run: |
-          echo "${{ secrets.HUMBLEAUTHSTATE }}" | base64 --decode > auth.json
+          if [ -z "$HUMBLEAUTHSTATE" ]; then
+            echo "::error::HUMBLEAUTHSTATE secret is missing or empty."
+            exit 1
+          fi
+          printf '%s' "$HUMBLEAUTHSTATE" | base64 --decode > auth.json
+          node -e "const fs = require('fs'); const auth = JSON.parse(fs.readFileSync('auth.json', 'utf8')); if (!Array.isArray(auth) || auth.length === 0) { console.error('::error::HUMBLEAUTHSTATE must contain a non-empty cookie array.'); process.exit(1); }"
 
       - name: Scrape Humble Games
         run: |

@@ -111,6 +111,7 @@ Write-Output $encoded
 - If your Humble session expires, repeat the export steps above.  
 - Replace the old secret with the new Base64 string.  
 - The GitHub Actions workflow will automatically use the updated auth during the next run.
+- The scraper fails with a clear error if Humble redirects to login, so an expired session fails the workflow instead of publishing an empty index. The workflow also fails early if `HUMBLEAUTHSTATE` is missing, invalid, or contains no cookies.
 
 ---
 
